@@ -2,6 +2,20 @@
 // Include the database configuration file
 include 'db/config.php';
 
+// Function to delete a menu item
+function deleteMenuItem($conn, $menuId)
+{
+    $menuId = mysqli_real_escape_string($conn, $menuId);
+    $query = "DELETE FROM menu WHERE id = '$menuId'";
+    $result = mysqli_query($conn, $query);
+
+    if ($result) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 // Fetch data from the database with JOINs
 $query = "
     SELECT 
@@ -24,6 +38,18 @@ $rows = mysqli_query($conn, $query);
 if (!$rows) {
     die('Query Error: ' . mysqli_error($conn));
 }
+
+// Handle delete request
+if (isset($_POST['delete_menu']) && isset($_POST['menu_id'])) {
+    $menuId = $_POST['menu_id'];
+    if (deleteMenuItem($conn, $menuId)) {
+        // Redirect to refresh the page after successful deletion
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
+    } else {
+        $deleteError = "Failed to delete menu item.";
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -44,11 +70,13 @@ if (!$rows) {
     <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 
-<body onload="table();">
+<body>
+    <div id="global-loader">
+        <div class="whirly-loader"> </div>
+    </div>
     <div class="main-wrapper">
         <div class="header">
             <?php include 'php/header.php'; ?>
-
         </div>
         <?php include 'php/sidebar.php'; ?>
         <div class="page-wrapper">
@@ -97,9 +125,13 @@ if (!$rows) {
                                         <div class="form-group">
                                             <select class="select" name="menu">
                                                 <option value="">Choose Menu</option>
-                                                <?php foreach ($menus as $menu): ?>
-                                                    <option value="<?php echo htmlspecialchars($menu); ?>"><?php echo htmlspecialchars($menu); ?></option>
-                                                <?php endforeach; ?>
+                                                <?php
+                                                $menu_query = "SELECT DISTINCT menu_name FROM menu";
+                                                $menu_result = mysqli_query($conn, $menu_query);
+                                                while ($menu = mysqli_fetch_assoc($menu_result)) {
+                                                    echo "<option value='" . htmlspecialchars($menu['menu_name']) . "'>" . htmlspecialchars($menu['menu_name']) . "</option>";
+                                                }
+                                                ?>
                                             </select>
                                         </div>
                                     </div>
@@ -107,9 +139,13 @@ if (!$rows) {
                                         <div class="form-group">
                                             <select class="select" name="category">
                                                 <option value="">Choose Category</option>
-                                                <?php foreach ($categories as $category): ?>
-                                                    <option value="<?php echo htmlspecialchars($category); ?>"><?php echo htmlspecialchars($category); ?></option>
-                                                <?php endforeach; ?>
+                                                <?php
+                                                $category_query = "SELECT DISTINCT category_name FROM menu";
+                                                $category_result = mysqli_query($conn, $category_query);
+                                                while ($category = mysqli_fetch_assoc($category_result)) {
+                                                    echo "<option value='" . htmlspecialchars($category['category_name']) . "'>" . htmlspecialchars($category['category_name']) . "</option>";
+                                                }
+                                                ?>
                                             </select>
                                         </div>
                                     </div>
@@ -117,7 +153,13 @@ if (!$rows) {
                                         <div class="form-group">
                                             <select class="select" name="subcategory">
                                                 <option value="">Choose Sub Category</option>
-
+                                                <?php
+                                                $subcategory_query = "SELECT DISTINCT subcategory_name FROM menu";
+                                                $subcategory_result = mysqli_query($conn, $subcategory_query);
+                                                while ($subcategory = mysqli_fetch_assoc($subcategory_result)) {
+                                                    echo "<option value='" . htmlspecialchars($subcategory['subcategory_name']) . "'>" . htmlspecialchars($subcategory['subcategory_name']) . "</option>";
+                                                }
+                                                ?>
                                             </select>
                                         </div>
                                     </div>
@@ -125,7 +167,9 @@ if (!$rows) {
                                         <div class="form-group">
                                             <select class="select" name="price">
                                                 <option value="">Choose Price</option>
-
+                                                <option value="0-50">$0 - $50</option>
+                                                <option value="50-100">$50 - $100</option>
+                                                <option value="100+">$100+</option>
                                             </select>
                                         </div>
                                     </div>
@@ -140,83 +184,105 @@ if (!$rows) {
                             </div>
                         </div>
 
-                        <div id="table">
-                            <div class="table-responsive">
-                                <table class="table datanew">
-                                    <thead>
+                        <div class="table-responsive">
+                            <table class="table datanew">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <label class="checkboxs">
+                                                <input type="checkbox" id="select-all" />
+                                                <span class="checkmarks"></span>
+                                            </label>
+                                        </th>
+                                        <th>Menu Name</th>
+                                        <th>Category</th>
+                                        <th>SubCategory</th>
+                                        <th>Price</th>
+                                        <th>Created By</th>
+                                        <th>Description</th>
+                                        <th>Discount Type</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php while ($row = mysqli_fetch_assoc($rows)) : ?>
                                         <tr>
-                                            <th>
+                                            <td>
                                                 <label class="checkboxs">
-                                                    <input type="checkbox" id="select-all" />
+                                                    <input type="checkbox" />
                                                     <span class="checkmarks"></span>
                                                 </label>
-                                            </th>
-                                            <th>Menu Name</th>
-
-                                            <th>Category</th>
-                                            <th>SubCategory</th>
-                                            <th>Price</th>
-                                            <th>Created By</th>
-                                            <th>Description</th>
-                                            <th>Discount Type</th>
-                                            <th>Status</th>
-                                            <th>Action</th>
+                                            </td>
+                                            <td class="productimgname">
+                                                <a href="javascript:void(0);" class="product-img">
+                                                    <img src="<?php echo htmlspecialchars($row['image_path']); ?>" alt="product" onerror="this.src='assets/img/default.jpg';" />
+                                                </a>
+                                                <a href="javascript:void(0);"><?php echo htmlspecialchars($row['menu_name']); ?></a>
+                                            </td>
+                                            <td><?php echo htmlspecialchars($row['category_name']); ?></td>
+                                            <td><?php echo htmlspecialchars($row['subcategory_name']); ?></td>
+                                            <td><?php echo htmlspecialchars($row['price']); ?></td>
+                                            <td><?php echo htmlspecialchars($row['created_by']); ?></td>
+                                            <td><?php echo htmlspecialchars($row['description']); ?></td>
+                                            <td><?php echo htmlspecialchars($row['discount_type']); ?></td>
+                                            <td><?php echo htmlspecialchars($row['status']); ?></td>
+                                            <td>
+                                                <a class="me-3" href="product-details.php?id=<?php echo $row['id']; ?>">
+                                                    <img src="assets/img/icons/eye.svg" alt="img" />
+                                                </a>
+                                                <a class="me-3" href="editproduct.php?id=<?php echo $row['id']; ?>">
+                                                    <img src="assets/img/icons/edit.svg" alt="img" />
+                                                </a>
+                                                <a class="me-3 confirm-text" href="javascript:void(0);" onclick="deleteMenu(<?php echo $row['id']; ?>)">
+                                                    <img src="assets/img/icons/delete.svg" alt="img" />
+                                                </a>
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php while ($row = mysqli_fetch_assoc($rows)) : ?>
-                                            <tr>
-                                                <td>
-                                                    <label class="checkboxs">
-                                                        <input type="checkbox" />
-                                                        <span class="checkmarks"></span>
-                                                    </label>
-                                                </td>
-                                                <td class="productimgname">
-                                                    <a href="javascript:void(0);" class="product-img">
-
-                                                        <img src="<?php echo htmlspecialchars($row['image_path']); ?>" alt="product" onerror="this.src='assets/img/default.jpg';" />
-                                                    </a>
-                                                    <a href="javascript:void(0);"><?php echo htmlspecialchars($row['menu_name']); ?></a>
-                                                </td>
-
-                                                <td><?php echo htmlspecialchars($row['category_name']); ?></td>
-                                                <td><?php echo htmlspecialchars($row['subcategory_name']); ?></td>
-                                                <td><?php echo htmlspecialchars($row['price']); ?></td>
-                                                <td><?php echo htmlspecialchars($row['created_by']); ?></td>
-                                                <td><?php echo htmlspecialchars($row['description']); ?></td>
-                                                <td><?php echo htmlspecialchars($row['discount_type']); ?></td>
-                                                <td><?php echo htmlspecialchars($row['status']); ?></td>
-                                                <td>
-                                                    <a class="me-3" href="product-details.php">
-                                                        <img src="assets/img/icons/eye.svg" alt="img" />
-                                                    </a>
-                                                    <a class="me-3" href="editproduct.php">
-                                                        <img src="assets/img/icons/edit.svg" alt="img" />
-                                                    </a>
-                                                    <a class="me-3" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#delete">
-                                                        <img src="assets/img/icons/delete.svg" alt="img" />
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        <?php endwhile; ?>
-                                    </tbody>
-                                </table>
-                            </div>
+                                    <?php endwhile; ?>
+                                </tbody>
+                            </table>
                         </div>
-
                     </div>
                 </div>
             </div>
         </div>
-
-
     </div>
 
-    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/jquery-3.6.0.min.js"></script>
+    <script src="assets/js/feather.min.js"></script>
+    <script src="assets/js/jquery.slimscroll.min.js"></script>
+    <script src="assets/js/jquery.dataTables.min.js"></script>
+    <script src="assets/js/dataTables.bootstrap4.min.js"></script>
     <script src="assets/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/datatables.min.js"></script>
+    <script src="assets/plugins/select2/js/select2.min.js"></script>
+    <script src="assets/plugins/sweetalert/sweetalert2.all.min.js"></script>
+    <script src="assets/plugins/sweetalert/sweetalerts.min.js"></script>
     <script src="assets/js/script.js"></script>
+    <script>
+        function deleteMenu(menuId) {
+            if (confirm("Are you sure you want to delete this menu item?")) {
+                var form = document.createElement("form");
+                form.method = "POST";
+                form.action = "<?php echo $_SERVER['PHP_SELF']; ?>";
+
+                var input = document.createElement("input");
+                input.type = "hidden";
+                input.name = "delete_menu";
+                input.value = "1";
+                form.appendChild(input);
+
+                var input2 = document.createElement("input");
+                input2.type = "hidden";
+                input2.name = "menu_id";
+                input2.value = menuId;
+                form.appendChild(input2);
+
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+    </script>
 </body>
 
 </html>

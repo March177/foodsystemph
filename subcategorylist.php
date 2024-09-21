@@ -1,21 +1,20 @@
 <?php
-// Include the database configuration file
+
 include 'db/config.php';
 
-// Include the file where getSubcategories() is defined
-// Get the selected status from the GET request
 $filter = [
     'status' => isset($_GET['status']) ? $_GET['status'] : ''
 ];
 
 
 
-// Fetch data from the database
+
 $rows = mysqli_query($conn, "SELECT * FROM subcategories"); // Adjust the table name and fields as needed
 
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0" />
@@ -31,6 +30,7 @@ $rows = mysqli_query($conn, "SELECT * FROM subcategories"); // Adjust the table 
     <link rel="stylesheet" href="assets/plugins/fontawesome/css/all.min.css" />
     <link rel="stylesheet" href="assets/css/style.css" />
 </head>
+
 <body>
     <div class="main-wrapper">
         <div class="header">
@@ -127,26 +127,26 @@ $rows = mysqli_query($conn, "SELECT * FROM subcategories"); // Adjust the table 
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php foreach($rows as $row) : ?>
-                                        <tr>
-                                            <td>
-                                                <label class="checkboxs">
-                                                    <input type="checkbox" />
-                                                    <span class="checkmarks"></span>
-                                                </label>
-                                            </td>
-                                            <td><?php echo htmlspecialchars($row['subcategory_name']); ?></td>
-                                            <td><?php echo htmlspecialchars($row['description']); ?></td>
-                                            <td><?php echo htmlspecialchars($row['status']); ?></td>
-                                            <td>
-                                                <a class="me-3" href="editsubcategory.php?id=<?php echo $row['c_id']; ?>">
-                                                    <img src="assets/img/icons/edit.svg" alt="img" />
-                                                </a>
-                                                <a class="me-3 confirm-text" href="javascript:void(0);" data-id="<?php echo htmlspecialchars($row['c_id']); ?>">
-                                                    <img src="assets/img/icons/delete.svg" alt="img" />
-                                                </a>
-                                            </td>
-                                        </tr>
+                                        <?php foreach ($rows as $row) : ?>
+                                            <tr>
+                                                <td>
+                                                    <label class="checkboxs">
+                                                        <input type="checkbox" />
+                                                        <span class="checkmarks"></span>
+                                                    </label>
+                                                </td>
+                                                <td><?php echo htmlspecialchars($row['subcategory_name']); ?></td>
+                                                <td><?php echo htmlspecialchars($row['description']); ?></td>
+                                                <td><?php echo htmlspecialchars($row['status']); ?></td>
+                                                <td>
+                                                    <a class="me-3" href="editsubcategory.php?id=<?php echo $row['c_id']; ?>">
+                                                        <img src="assets/img/icons/edit.svg" alt="img" />
+                                                    </a>
+                                                    <a class="me-3 confirm-text" href="javascript:void(0);" data-id="<?php echo htmlspecialchars($row['c_id']); ?>">
+                                                        <img src="assets/img/icons/delete.svg" alt="img" />
+                                                    </a>
+                                                </td>
+                                            </tr>
                                         <?php endforeach; ?>
                                     </tbody>
                                 </table>
@@ -159,61 +159,60 @@ $rows = mysqli_query($conn, "SELECT * FROM subcategories"); // Adjust the table 
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-    $(document).ready(function() {
-        $('#status-filter').on('change', function() {
-            performFilter();
-        });
+        $(document).ready(function() {
+            $('#status-filter').on('change', function() {
+                performFilter();
+            });
 
-        $('.confirm-text').on('click', function(e) {
-            e.preventDefault();
-            var id = $(this).data('id');
+            $('.confirm-text').on('click', function(e) {
+                e.preventDefault();
+                var id = $(this).data('id');
 
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: 'delete_subcategory.php', // Ensure this URL is correct
-                        type: 'GET',
-                        data: {
-                            id: id
-                        },
-                        success: function(response) {
-                            // Optionally, refresh the subcategory list or handle UI updates
-                            location.reload(); // Reload the page to see changes
-                        },
-                        error: function() {
-                            alert('An error occurred while processing the request.');
-                        }
-                    });
-                }
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: 'delete_subcategory.php',
+                            data: {
+                                id: id
+                            },
+                            success: function(response) {
+
+                                location.reload();
+                            },
+                            error: function() {
+                                alert('An error occurred while processing the request.');
+                            }
+                        });
+                    }
+                });
             });
         });
-    });
 
-    function performFilter() {
-        var status = $('#status-filter').val(); // Get the selected status
+        function performFilter() {
+            var status = $('#status-filter').val();
 
-        $.ajax({
-            url: 'get_filtered_subcategories.php', // PHP file that handles filtering
-            type: 'GET',
-            data: {
-                status: status
-            },
-            success: function(response) {
-                $('#table').html(response); // Update the table with the filtered results
-            },
-            error: function() {
-                alert('An error occurred while processing the request.');
-            }
-        });
-    }
+            $.ajax({
+                url: 'getsubcategory.php',
+                type: 'GET',
+                data: {
+                    status: status
+                },
+                success: function(response) {
+                    $('#table').html(response);
+                },
+                error: function() {
+                    alert('An error occurred while processing the request.');
+                }
+            });
+        }
     </script>
     <script src="assets/js/jquery-3.6.0.min.js"></script>
     <script src="assets/js/feather.min.js"></script>
@@ -226,4 +225,5 @@ $rows = mysqli_query($conn, "SELECT * FROM subcategories"); // Adjust the table 
     <script src="assets/plugins/sweetalert/sweetalerts.min.js"></script>
     <script src="assets/js/script.js"></script>
 </body>
+
 </html>

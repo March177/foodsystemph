@@ -47,6 +47,7 @@ if (isset($_POST['login'])) {
                 echo "Error: " . $stmt->error;
             } else {
                 header("Location: index.html");
+                exit;
             }
         } else {
             echo "Device limit reached. Please log out from another device first.";
@@ -57,26 +58,46 @@ if (isset($_POST['login'])) {
 }
 ?>
 
-
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>Admin Login</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Login Form</title>
+    <link rel="icon" href="images/favicon.png" />
+    <link href="https://fonts.googleapis.com/css2?family=Lato:100,300,400,700,900&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="assets/css/admin.css" />
+
+
 </head>
 
 <body>
-    <h1>Admin Login</h1>
-    <form action="loginadmin.php" method="post">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required><br><br>
+    <div class="wrapper">
+        <div class="container">
+            <form class="login-form" action="" method="post">
+                <span class="form-title">Log in</span>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" name="username" class="form-control" placeholder="Enter your username" required />
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" class="form-control" placeholder="Enter your Password" required>
+                </div>
+                <div class="form-group">
+                    <span class="forgot-link"><a href="register.php">forgot password?</a></span>
+                </div>
+                <div class="form-group">
+                    <input type="submit" name="login" class="btn btn-primary btn-lg btn-block" value="Login">
+                </div>
+                <p>Don't have an account? <a href="admin_signup.php">Register here</a>.</p>
+            </form>
+        </div>
 
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required><br><br>
-
-        <button type="submit" name="login">Login</button>
-    </form>
+    </div>
 </body>
 
 </html>

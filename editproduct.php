@@ -3,13 +3,10 @@
 include 'db/config.php';
 
 if (!isset($_GET['id'])) {
-
     die('Menu ID not provided.');
 }
 
-
 $menu_id = intval($_GET['id']);
-
 
 $query = "SELECT * FROM menu WHERE id = $menu_id";
 $result = mysqli_query($conn, $query);
@@ -26,8 +23,6 @@ if ($result && mysqli_num_rows($result) > 0) {
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0" />
-
-
     <meta name="robots" content="noindex, nofollow" />
     <title>Edit Product</title>
 
@@ -85,7 +80,6 @@ if ($result && mysqli_num_rows($result) > 0) {
                                         <select name="category" class="form-control">
                                             <option value="">Choose Category</option>
                                             <?php
-
                                             $query = "SELECT DISTINCT category FROM menu";
                                             $result = $conn->query($query);
                                             if ($result->num_rows > 0) {
@@ -104,10 +98,9 @@ if ($result && mysqli_num_rows($result) > 0) {
                                         <select name="subcategory" class="form-control">
                                             <option value="">Choose Sub Category</option>
                                             <?php
-
-                                            $query = "SELECT DISTINCT subcategory FROM menu WHERE subcategory IS NOT NULL";
+                                            $query = "SELECT DISTINCT subcategory FROM menu WHERE subcategory IS NOT NULL AND subcategory != ''";
                                             $result = $conn->query($query);
-                                            if ($result->num_rows > 0) {
+                                            if ($result && $result->num_rows > 0) {
                                                 while ($row = $result->fetch_assoc()) {
                                                     $selected = ($menu['subcategory'] == $row['subcategory']) ? 'selected' : '';
                                                     echo '<option value="' . htmlspecialchars($row['subcategory']) . '" ' . $selected . '>' . htmlspecialchars($row['subcategory']) . '</option>';
@@ -167,7 +160,6 @@ if ($result && mysqli_num_rows($result) > 0) {
                                     </div>
                                 </div>
 
-
                                 <div class="col-lg-12">
                                     <button type="submit" class="btn btn-primary">Update Menu</button>
                                 </div>
@@ -198,7 +190,6 @@ if ($result && mysqli_num_rows($result) > 0) {
                     imagePreview.style.display = 'none';
                 }
             });
-
 
             $(document).ready(function() {
                 $('#edit-menu-form').on('submit', function(event) {

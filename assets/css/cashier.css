@@ -17,7 +17,7 @@ body {
   font-weight: 300;
   background-color: white;
   /*    height: 100%;
-      background: linear-gradient(90deg, #50a3a2 50%, #FFFFFF 50%);*/
+        background: linear-gradient(90deg, #50a3a2 50%, #FFFFFF 50%);*/
 }
 body ::-webkit-input-placeholder {
   /* WebKit browsers */
@@ -76,7 +76,7 @@ body :-ms-input-placeholder {
   flex-direction: row-reverse;
   padding: 0px;
   width: 50%;
-  height: 600px;
+  height: 697px;
   border-radius: 15px;
 }
 
@@ -254,6 +254,7 @@ label {
   .login-form {
     padding-left: 30px;
     padding-right: 30px;
+    padding-bottom: 173px;
   }
   .container {
     width: 100%;

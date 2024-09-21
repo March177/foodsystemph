@@ -1,7 +1,7 @@
 <?php
 
 include 'db/config.php';
-include 'get_filtered_categories.php';
+include 'getcategory.php';
 
 $filter = [
   'status' => isset($_GET['status']) ? $_GET['status'] : ''
@@ -189,7 +189,7 @@ $rows = get_filtered_categories($filter);
         var status = $('#status-filter').val();
 
         $.ajax({
-          url: 'get_filtered_categories.php',
+          url: 'getcategory.php',
           type: 'GET',
           data: {
             status: status
