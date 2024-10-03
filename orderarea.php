@@ -24,6 +24,7 @@
 
     .star {
       color: #fbbf24;
+      /* Star color */
     }
 
     .input-box {
@@ -32,8 +33,10 @@
     }
 
     .input-box:focus {
-      border-color: #805ad5;
-      box-shadow: 0 0 0 1px #805ad5;
+      border-color: #d53f8c;
+      /* Change border color on focus */
+      box-shadow: 0 0 0 1px #d53f8c;
+      /* Change shadow color */
     }
 
     /* Align date and time selector in one row */
@@ -56,7 +59,8 @@
     }
 
     .action-button {
-      background-color: #9f7aea;
+      background-color: #d53f8c;
+      /* Change background color to pink */
       color: white;
       padding: 0.75rem;
       border-radius: 0.25rem;
@@ -66,7 +70,8 @@
     }
 
     .action-button:hover {
-      background-color: #805ad5;
+      background-color: #b83280;
+      /* Darker pink on hover */
     }
 
     .quantity-button {
@@ -178,7 +183,7 @@
           <!-- Cake Details and Form -->
           <div class="w-full md:w-1/2 md:pl-10 mt-6 md:mt-0">
             <h2 class="text-md text-gray-500">Purple Cake Shop</h2>
-            <h1 class="text-4xl font-bold mb-2 text-purple-600"><?= htmlspecialchars($cake['menu_name']) ?></h1>
+            <h1 class="text-4xl font-bold mb-2 text-pink-600"><?= htmlspecialchars($cake['menu_name']) ?></h1>
 
             <!-- Star Ratings -->
             <div class="flex items-center mb-2">
@@ -243,21 +248,12 @@
       } else {
         echo '<p class="text-red-500">Cake not found!</p>';
       }
-    } else {
-      echo '<p class="text-red-500">Invalid cake ID!</p>';
     }
-
-    // Close the database connection
-    $conn->close();
     ?>
+
   </div>
 
   <script>
-    function toggleCartDropdown() {
-      const cartDropdown = document.getElementById('cart-dropdown');
-      cartDropdown.classList.toggle('active');
-    }
-
     function incrementQuantity() {
       const quantityInput = document.getElementById('quantity');
       quantityInput.value = parseInt(quantityInput.value) + 1;
@@ -272,19 +268,32 @@
 
     function addToCart(event) {
       event.preventDefault();
-      // Add your logic for adding to the cart here
-      alert('Item added to cart!');
+      const quantity = document.getElementById('quantity').value;
+      const cakeId = document.querySelector('input[name="cake_id"]').value;
+
+      if (quantity > 0) {
+        // Logic to add item to cart
+        console.log(`Added ${quantity} of cake ID ${cakeId} to cart.`);
+        document.getElementById('cart-count').innerText = parseInt(document.getElementById('cart-count').innerText) + parseInt(quantity);
+        alert('Cake added to cart!');
+      } else {
+        alert('Please select a quantity!');
+      }
     }
 
     function buyNow(cakeId) {
-      const quantityInput = document.getElementById('quantity');
-      const quantity = parseInt(quantityInput.value);
+      const quantity = document.getElementById('quantity').value;
       if (quantity > 0) {
-        // Redirect to payment.php with cake ID and quantity as query parameters
-        window.location.href = `payment.php?cake_id=${cakeId}&quantity=${quantity}`;
+        // Logic for buying the cake directly
+        console.log(`Buying ${quantity} of cake ID ${cakeId}.`);
       } else {
-        alert('Please select a quantity before proceeding to payment.');
+        alert('Please select a quantity!');
       }
+    }
+
+    function toggleCartDropdown() {
+      const dropdown = document.getElementById('cart-dropdown');
+      dropdown.classList.toggle('active');
     }
   </script>
 </body>
