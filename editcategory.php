@@ -1,16 +1,13 @@
 <?php
-// Include the database configuration file
+
 include 'db/config.php';
 
-// Check if the ID is provided
 if (!isset($_GET['c_id'])) {
     die('Category ID not provided.');
 }
 
-// Get the category ID from the URL
 $c_id = intval($_GET['c_id']);
 
-// Fetch the category data from the database
 $query = "SELECT * FROM categories WHERE c_id = $c_id";
 $result = mysqli_query($conn, $query);
 
@@ -43,7 +40,7 @@ if ($result && mysqli_num_rows($result) > 0) {
         .alert {
             display: none;
             position: fixed;
-            top: 20px;
+            top: 10px;
             right: 20px;
             padding: 10px;
             background-color: #4CAF50;
@@ -59,6 +56,7 @@ if ($result && mysqli_num_rows($result) > 0) {
             <?php include 'php/header.php'; ?>
         </div>
         <?php include 'php/sidebar.php'; ?>
+
         <div class="page-wrapper">
             <div class="content">
                 <div class="page-header">
@@ -71,8 +69,9 @@ if ($result && mysqli_num_rows($result) > 0) {
                 <div class="card">
                     <div class="card-body">
                         <div class="alert" id="success-alert">Update successful!</div>
-                        <form id="edit-category-form">
-                            <input type="hidden" name="id" value="<?php echo htmlspecialchars($category['c+id']); ?>" />
+
+                        <form id="edit-category-form" method="POST">
+                            <input type="hidden" name="c_id" value="<?php echo htmlspecialchars($category['c_id']); ?>" />
 
                             <div class="row">
                                 <div class="col-lg-4 col-sm-6 col-12">
@@ -107,32 +106,48 @@ if ($result && mysqli_num_rows($result) > 0) {
             </div>
         </div>
     </div>
+    
     <script src="assets/js/jquery-3.6.0.min.js"></script>
     <script>
-        $(document).ready(function() {
-            $('#edit-category-form').on('submit', function(event) {
-                event.preventDefault(); // Prevent default form submission
+    $(document).ready(function() {
+        $('#edit-category-form').on('submit', function(e) {
+            e.preventDefault(); // Prevent the default form submission
 
-                $.ajax({
-                    url: 'db/update_category.php',
-                    type: 'POST',
-                    data: new FormData(this),
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        if (response.trim() === 'success') {
-                            $('#success-alert').fadeIn().delay(2000).fadeOut(); // Show and hide success message
-                        } else {
-                            alert('An error occurred: ' + response);
-                        }
-                    },
-                    error: function() {
-                        alert('An error occurred. Please try again.');
+            // Client-side validation
+            var categoryName = $('input[name="category_name"]').val().trim();
+            var status = $('select[name="status"]').val();
+
+            if (categoryName === '' || status === '') {
+                alert('Please fill in all required fields.');
+                return false; // Prevent form submission
+            }
+
+            $.ajax({
+                url: 'functions/updatecategory.php', // URL to the update script
+                type: 'POST',
+                data: $(this).serialize(), // Serialize form data
+                success: function(response) {
+                    if (response.trim() === 'success') {
+                        $('#success-alert').fadeIn().delay(2000).fadeOut();
+                        // Optionally redirect
+                        setTimeout(function() {
+                            window.location.href = 'categorylist.php'; // Example redirect after success
+                        }, 2000);
+                    } else {
+                        alert('An error occurred: ' + response);
                     }
-                });
+                },
+                error: function() {
+                    alert('An error occurred. Please try again.');
+                }
             });
         });
-    </script>
+    });
+    
+</script>
+
+    <script src="path/to/feather.min.js"></script>
+    <script src="assets/js/jquery-3.6.0.min.js"></script>
     <script src="assets/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/select2.min.js"></script>
     <script src="assets/js/script.js"></script>

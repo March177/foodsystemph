@@ -1,7 +1,7 @@
 <?php
 
 include 'db/config.php';
-include 'getcategory.php';
+include 'functions/getcategory.php';
 
 $filter = [
   'status' => isset($_GET['status']) ? $_GET['status'] : ''
@@ -152,15 +152,19 @@ $rows = get_filtered_categories($filter);
                           </label>
                         </td>
                         <td><?php echo htmlspecialchars($row['category_name']); ?></td>
-                        <td><?php echo htmlspecialchars($row['description']); ?></td>
+                        <td><?php echo htmlspecialchars(substr($row['description'], 0, 50)) . '...'; ?></td>
                         <td><?php echo htmlspecialchars($row['status']); ?></td>
                         <td>
-                          <a class="me-3" href="editcategory.php?id=<?php echo $row['c_id']; ?>">
+                          <a class="me-3" href="categorydetails.php?id=<?php echo htmlspecialchars($row['c_id']); ?>">
+                            <img src="assets/img/icons/eye.svg" alt="img" />
+                          </a>
+                          <a class="me-3" href="editcategory.php?c_id=<?php echo $row['c_id']; ?>">
                             <img src="assets/img/icons/edit.svg" alt="img" />
                           </a>
                           <a class="me-3 confirm-text" href="javascript:void(0);" data-id="<?php echo htmlspecialchars($row['c_id']); ?>">
                             <img src="assets/img/icons/delete.svg" alt="img" />
                           </a>
+
                         </td>
                       </tr>
                     <?php endforeach; ?>
@@ -181,10 +185,6 @@ $rows = get_filtered_categories($filter);
         performFilter();
       });
 
-
-
-
-
       function performFilter() {
         var status = $('#status-filter').val();
 
@@ -195,13 +195,55 @@ $rows = get_filtered_categories($filter);
             status: status
           },
           success: function(response) {
-            $('#table').html(response);
+            $('#table tbody').html(response); // Replace the table body with the new rows
           },
           error: function() {
             alert('An error occurred while processing the request.');
           }
         });
       }
+    });
+
+    $(document).ready(function() {
+      $(document).on("click", ".confirm-text", function() {
+        var $this = $(this);
+        var c_id = $this.data("id");
+
+        var deleteUrl = "delete_menu.php";
+
+        Swal.fire({
+          title: "Are you sure?",
+          text: "Proceeding will delete this item permanently from the database!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, delete it!",
+          cancelButtonText: "Cancel",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            $.ajax({
+              url: deleteUrl,
+              type: "POST",
+              data: {
+                c_id: c_id
+              },
+              dataType: "json",
+              success: function(response) {
+                if (response.success) {
+                  Swal.fire("Deleted!", response.message, "success");
+                  $this.closest("tr").remove(); // Remove the row from the table
+                } else {
+                  Swal.fire("Error!", response.message, "error");
+                }
+              },
+              error: function() {
+                Swal.fire("Error!", "There was an error deleting the item from the database.", "error");
+              },
+            });
+          }
+        });
+      });
     });
   </script>
 

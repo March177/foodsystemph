@@ -13,16 +13,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     echo '</pre>';
 
     $menu_name = trim($_POST['menu_name']);
-    $code = trim($_POST['code']);
+
     $category_name = trim($_POST['category_name']);
-    $subcategory_name = trim($_POST['subcategory_name']);
+
     $description = trim($_POST['description']);
     $discount_type = trim($_POST['discount_type']);
     $price = trim($_POST['price']);
     $status = trim($_POST['status']);
 
 
-    if (empty($menu_name) || empty($code) || empty($category_name) || empty($subcategory_name) || empty($description) || empty($price) || empty($status)) {
+    if (empty($menu_name)  || empty($category_name) || empty($description) || empty($price) || empty($status)) {
         echo "All fields are required.";
         exit();
     }
@@ -62,18 +62,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             if (move_uploaded_file($_FILES['menu_image']['tmp_name'], $uploadFile)) {
 
-                $stmt = $conn->prepare("INSERT INTO menu (menu_name, code, category_name, subcategory_name, created_by, description, discount_type, price, status, image_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt = $conn->prepare("INSERT INTO menu (menu_name, category_name, created_by, description, discount_type, price, status, image_path) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?)");
                 if ($stmt === false) {
                     echo "Prepare failed: " . htmlspecialchars($conn->error);
                     exit();
                 }
 
                 $imagePath = 'img/menu/' . $fileName;
-                $stmt->bind_param("ssssssssss", $menu_name, $code, $category_name, $subcategory_name, $created_by, $description, $discount_type, $price, $status, $imagePath);
+                $stmt->bind_param("ssssssss", $menu_name, $category_name, $created_by, $description, $discount_type, $price, $status, $imagePath);
 
                 if ($stmt->execute()) {
 
-                    header("Location: /RestaurantSystem-master/addproduct.php?success=1");
+                    header("Location: /RestaurantSystem-master/menulist.php");
                     exit();
                 } else {
                     echo "Execute failed: " . htmlspecialchars($stmt->error);

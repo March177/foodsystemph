@@ -140,52 +140,23 @@ document.addEventListener("DOMContentLoaded", function () {
       checkoutTotalElement.textContent = `${total.toFixed(2)}₱`;
     }
   }
-
-  // document.addEventListener("DOMContentLoaded", function () {
-  //   // Example function to submit order and update the total items
-  //   function submitOrder(orderData) {
-  //     fetch("path/to/your/script.php", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(orderData),
-  //     })
-  //       .then((response) => response.json())
-  //       .then((data) => {
-  //         if (data.error) {
-  //           console.error(data.error);
-  //         } else {
-  //           // Update total items in the DOM
-  //           document.getElementById("total-items").textContent =
-  //             data.total_quantity;
-  //         }
-  //       })
-  //       .catch((error) => console.error("Error:", error));
-  //   }
-
-  //   // Call the function to submit the order
-  //   submitOrder(orderData);
-  // });
-
   $(document).ready(function () {
     $("#checkoutBtn").click(function () {
       // Collect data from your form or cart
       var order_type = $("#orderType").val();
       var discount = $("#discount").val();
-      var total_amount = $("#totalAmount")
-        .text()
-        .replace("₱", "")
-        .replace(",", "");
+      var total_price = $("#total-value").text().replace("₱", "").trim();
       var payment_method = $('input[name="payment_method"]:checked').val();
+      var customer = $("#walkin-name").val() || "Walk-in Customer"; // Assuming you have an input for customer name
+      var created_by = "1"; // Replace with actual user ID or name of the person creating the order
 
       // Collect ordered items
       var orderedItems = [];
       $(".product-lists li[data-id]").each(function () {
         var item = {
-          id: $(this).attr("data-id"),
-          name: $(this).find("h4").text().trim(),
-          image: $(this).find("img").attr("src"),
+          menu_id: $(this).attr("data-id"),
+          menu_name: $(this).find("h4").text().trim(),
+          menu_image: $(this).find("img").attr("src"),
           category: $(this).closest("ul").attr("data-category-id"),
           quantity: $(this).find(".quantity-field").val(),
           price: parseFloat(
@@ -197,25 +168,36 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Data to be sent
       var data = {
+        customer: customer,
         order_type: order_type,
         discount: discount,
-        total_amount: total_amount,
         payment_method: payment_method,
-        orderedItems: orderedItems, // Include the ordered items
+        total_price: total_price,
+        created_by: created_by,
+        orderedItems: orderedItems,
       };
 
       // Send data via AJAX
       $.ajax({
         url: "process_checkout.php",
         type: "POST",
-        data: JSON.stringify(data), // Send as JSON
+        data: JSON.stringify(data),
         contentType: "application/json",
+        dataType: "json",
         success: function (response) {
-          alert(response); // Show the response from the server
-          window.location.href = "pos.php";
+          if (response.status === "success") {
+            alert(response.message);
+            console.log("Order ID: " + response.order_id);
+            window.location.href = "pos.php"; // Redirect to POS page after successful insertion
+          } else {
+            alert("Error: " + response.message);
+          }
         },
-        error: function () {
-          alert("There was an error processing your order. Please try again.");
+        error: function (jqXHR, textStatus, errorThrown) {
+          alert(
+            "There was an error processing your order: " + jqXHR.responseText
+          );
+          console.error("AJAX error: " + textStatus + " : " + errorThrown);
         },
       });
     });
@@ -226,8 +208,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const input = button.parentElement.querySelector(".quantity-field");
     let value = parseInt(input.value, 10);
 
-    if (isNaN(value)) {
-      value = 0;
+    if (isNaN(value) || value < 0) {
+      value = 0; // Reset to zero if invalid or negative
     }
 
     if (button.classList.contains("button-minus")) {

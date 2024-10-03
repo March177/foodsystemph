@@ -24,12 +24,11 @@ function isActive($page)
             <span class="menu-arrow"></span>
           </a>
           <ul>
-            <li><a href="productlist.php">Menu List</a></li>
-            <li><a href="addproduct.php">Add Menu</a></li>
-            <li><a href="categorylist.php">Category List</a></li>
-            <li><a href="addcategory.php">Add Category</a></li>
-            <li><a href="subcategorylist.php">Sub Category List</a></li>
-            <li><a href="subaddcategory.php">Add Sub Category</a></li>
+            <li><a href="menulist.php" class="<?php echo isActive('menulist.php'); ?>">Menu List</a></li>
+            <li><a href="addmenu.php" class="<?php echo isActive('addmenu.php'); ?>">Add Menu</a></li>
+            <li><a href="categorylist.php" class="<?php echo isActive('categorylist.php'); ?>">Category List</a></li>
+            <li><a href="addcategory.php" class="<?php echo isActive('addcategory.php'); ?>">Add Category</a></li>
+
           </ul>
         </li>
         <li class="submenu">
@@ -38,7 +37,7 @@ function isActive($page)
             <span class="menu-arrow"></span>
           </a>
           <ul>
-            <li><a href="reviewlist.html">Review List</a></li>
+            <li><a href="reviewlist.html" class="<?php echo isActive('reviewlist.html'); ?>">Review List</a></li>
           </ul>
         </li>
         <li class="submenu">
@@ -47,8 +46,8 @@ function isActive($page)
             <span class="menu-arrow"></span>
           </a>
           <ul>
-            <li><a href="discountlist.html">Discount List</a></li>
-            <li><a href="discount.html">Add Discount</a></li>
+            <li><a href="discountlist.php" class="<?php echo isActive('discountlist.php'); ?>">Discount List</a></li>
+            <li><a href="adddiscount.php" class="<?php echo isActive('addiscount.php'); ?>">Add Discount</a></li>
           </ul>
         </li>
         <li class="submenu">
@@ -57,10 +56,8 @@ function isActive($page)
             <span class="menu-arrow"></span>
           </a>
           <ul>
-            <li><a href="customerlist.html">Customer List</a></li>
-            <li><a href="addcustomer.html">Add Customer</a></li>
-            <li><a href="userlist.html">User List</a></li>
-            <li><a href="adduser.html">Add User</a></li>
+            <li><a href="customerlist.php" class="<?php echo isActive('customerlist.html'); ?>">Customer List</a></li>
+            <li><a href="addcustomer.php" class="<?php echo isActive('addcustomer.html'); ?>">Add Customer</a></li>
           </ul>
         </li>
         <li class="submenu">
@@ -69,12 +66,11 @@ function isActive($page)
             <span class="menu-arrow"></span>
           </a>
           <ul>
-            <li><a href="purchaseorderreport.html">Purchase order report</a></li>
-            <li><a href="inventoryreport.html">Inventory Report</a></li>
-            <li><a href="salesreport.html">Sales Report</a></li>
-            <li><a href="invoicereport.html">Invoice Report</a></li>
-            <li><a href="purchasereport.html">Purchase Report</a></li>
-            <li><a href="customerreport.html">Customer Report</a></li>
+            <li><a href="purchaseorderreport.php" class="<?php echo isActive('purchaseorderreport.php'); ?>">Purchase order report</a></li>
+            <li><a href="inventoryreport.html" class="<?php echo isActive('inventoryreport.php'); ?>">Inventory Report</a></li>
+            <li><a href="salesreport.html" class="<?php echo isActive('salesreport.php'); ?>">Sales Report</a></li>
+            <li><a href="invoicereport.html" class="<?php echo isActive('invoicereport.php'); ?>">Invoice Report</a></li>
+            <li><a href="customerreport.php" class="<?php echo isActive('customerreport.php'); ?>">Customer Report</a></li>
           </ul>
         </li>
         <li class="submenu">
@@ -83,8 +79,8 @@ function isActive($page)
             <span class="menu-arrow"></span>
           </a>
           <ul>
-            <li><a href="newuser.html">New User</a></li>
-            <li><a href="userlists.html">Users List</a></li>
+            <li><a href="newuser.php" class="<?php echo isActive('newuser.php'); ?>">New User</a></li>
+            <li><a href="userlists.php" class="<?php echo isActive('userlists.php'); ?>">Users List</a></li>
           </ul>
         </li>
         <li class="submenu">
@@ -93,7 +89,7 @@ function isActive($page)
             <span class="menu-arrow"></span>
           </a>
           <ul>
-            <li><a href="generalsettings.html">General Settings</a></li>
+            <li><a href="generalsettings.php" class="<?php echo isActive('generalsettings.php'); ?>">General Settings</a></li>
           </ul>
         </li>
       </ul>

@@ -1,15 +1,15 @@
 <?php
 include 'db/config.php';
-include 'insertcategory.php'; // Include the file with the functions
+include 'functions/getcategory.php'; // Include the file with the functions
 
 // Check if form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Retrieve form data
     $category_name = $_POST['category_name'];
-  
+
     $description = $_POST['description'];
     $status = $_POST['status'];
-    
+
     // Call the function to insert category
     $success = insertCategory($conn, $category_name, $description, $status);
 
@@ -24,6 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0" />
@@ -41,18 +42,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <style>
         .alert-custom {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 300px; /* Adjust the width as needed */
-            z-index: 9999; /* Ensure it's on top of other content */
-            display: none; /* Hide by default */
+            top: 10%;
+            left: 80%;
+
+            width: 300px;
+            /* Adjust the width as needed */
+            z-index: 9999;
+            /* Ensure it's on top of other content */
+            display: none;
+            /* Hide by default */
             text-align: center;
             padding: 10px;
             border-radius: 5px;
         }
     </style>
 </head>
+
 <body>
     <div class="main-wrapper">
         <div class="header">
@@ -86,7 +91,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         <input type="text" name="category_name" class="form-control" required />
                                     </div>
                                 </div>
-                            
+
                                 <div class="col-lg-3 col-sm-6 col-12">
                                     <div class="form-group">
                                         <label>Status</label>
@@ -104,7 +109,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 </div>
                                 <div class="col-lg-12">
                                     <button type="submit" class="btn btn-submit">Submit</button>
-                                    <a href="productlist.php" class="btn btn-cancel">Cancel</a>
+                                    <a href="menulist.php" class="btn btn-cancel">Cancel</a>
                                 </div>
                             </div>
                         </form>
@@ -136,4 +141,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </div>
 </body>
+
 </html>

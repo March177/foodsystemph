@@ -1,88 +1,108 @@
 <?php
-// Database connection
-$host = 'localhost';
-$db = 'restaurant_db';
-$user = 'root';
-$pass = '';
+include 'db/config.php';
+
+// Enable error reporting for debugging (remove in production)
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// Function to log errors
+function logError($message) {
+    error_log(date('[Y-m-d H:i:s] ') . $message . "\n", 3, 'error.log');
+}
+
+// Receive and decode the JSON data
+$json_data = file_get_contents('php://input');
+$data = json_decode($json_data, true);
+
+// Log received data
+logError("Received data: " . print_r($data, true));
+
+// Start a transaction
+$conn->begin_transaction();
 
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Database connection failed: " . $e->getMessage());
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Retrieve and decode JSON data from POST request
-    $data = json_decode(file_get_contents('php://input'), true);
-
-    // Check if JSON data is properly decoded
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        echo "Invalid JSON data.";
-        exit;
+    // First, insert into orders table
+    $order_query = "INSERT INTO orders (customer, order_type, discount, payment_method, total_price, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())";
+    $order_stmt = $conn->prepare($order_query);
+    
+    if (!$order_stmt) {
+        throw new Exception("Prepare failed: " . $conn->error);
     }
 
-    $order_id = 'ORD' . uniqid();
-    $customer = 'Walk-In';
-    $order_type = isset($data['order_type']) ? $data['order_type'] : '';
-    $discount = isset($data['discount']) ? $data['discount'] : 0;
-    $total_price = isset($data['total_amount']) ? $data['total_amount'] : 0;
-    $payment_method = isset($data['payment_method']) ? $data['payment_method'] : '';
-    $created_by = 'Cashier';
-    $created_at = date('Y-m-d H:i:s');
+    // Ensure total_price is a float
+    $total_price = floatval($data['total_price']);
 
-    try {
-        // Start transaction
-        $pdo->beginTransaction();
+    $bind_result = $order_stmt->bind_param("ssssds", 
+        $data['customer'], 
+        $data['order_type'], 
+        $data['discount'], 
+        $data['payment_method'], 
+        $total_price,
+        $data['created_by']
+    );
+    
+    if (!$bind_result) {
+        throw new Exception("Binding parameters failed: " . $order_stmt->error);
+    }
 
-        // Insert into orders table
-        $stmt = $pdo->prepare("
-            INSERT INTO orders 
-            (order_id, customer, order_type, discount, payment_method, total_price, created_at, created_by) 
-            VALUES 
-            (:order_id, :customer, :order_type, :discount, :payment_method, :total_price, :created_at, :created_by)
-        ");
-        $stmt->execute([
-            ':order_id' => $order_id,
-            ':customer' => $customer,
-            ':order_type' => $order_type,
-            ':discount' => $discount,
-            ':payment_method' => $payment_method,
-            ':total_price' => $total_price,
-            ':created_at' => $created_at,
-            ':created_by' => $created_by
-        ]);
+    // Execute the order insertion
+    $exec_result = $order_stmt->execute();
+    
+    if (!$exec_result) {
+        logError("Execute failed for order: " . $order_stmt->error);
+        throw new Exception("Execute failed");
+    }
 
-        // Insert into order_menu table
-        $stmt = $pdo->prepare("
-            INSERT INTO order_menu 
-            (order_id, menu_name, menu_image, category, subcategory, quantity, price) 
-            VALUES 
-            (:order_id, :menu_name, :menu_image, :category, :subcategory, :quantity, :price)
-        ");
+    // Get the last inserted order_id
+    $order_id = $conn->insert_id;
 
-        if (isset($data['orderedItems']) && is_array($data['orderedItems'])) {
-            foreach ($data['orderedItems'] as $item) {
-                $stmt->execute([
-                    ':order_id' => $order_id,
-                    ':menu_name' => isset($item['name']) ? $item['name'] : '',
-                    ':menu_image' => isset($item['image']) ? $item['image'] : '',
-                    ':category' => isset($item['category']) ? $item['category'] : '',
-                    ':subcategory' => isset($item['subcategory']) ? $item['subcategory'] : '', // Check if this key exists
-                    ':quantity' => isset($item['quantity']) ? $item['quantity'] : 0,
-                    ':price' => isset($item['price']) ? $item['price'] : 0
-                ]);
-            }
+    if (!$order_id) {
+        throw new Exception("Failed to insert order: No order_id returned");
+    }
+
+    logError("Order inserted successfully. Order ID: " . $order_id);
+    
+    // Continue with order details...
+    // Assuming you have an array of ordered items
+    $orderedItems = $data['orderedItems'];
+    
+    // Insert each ordered item into the order_details table
+    $details_query = "INSERT INTO order_details (order_id, menu_id, quantity, price) VALUES (?, ?, ?, ?)";
+    $details_stmt = $conn->prepare($details_query);
+    
+    if (!$details_stmt) {
+        throw new Exception("Prepare failed: " . $conn->error);
+    }
+
+    foreach ($orderedItems as $item) {
+        $details_stmt->bind_param("iiid", 
+            $order_id, 
+            $item['menu_id'], 
+            $item['quantity'], 
+            $item['price']
+        );
+        
+        if (!$details_stmt->execute()) {
+            logError("Failed to insert order detail: " . $details_stmt->error);
         }
-
-        // Commit transaction
-        $pdo->commit();
-
-        echo "Order and transaction recorded successfully.";
-    } catch (PDOException $e) {
-        // Rollback transaction if there's an error
-        $pdo->rollBack();
-        echo "Error: " . $e->getMessage();
     }
+
+    // Commit the transaction
+    $conn->commit();
+
+    // Send a success response
+    echo json_encode(["status" => "success", "order_id" => $order_id, "message" => "Order processed successfully."]);
+} catch (Exception $e) {
+    // Rollback the transaction on error
+    $conn->rollback();
+    
+    // Log the error message
+    logError("Error processing order: " . $e->getMessage());
+    
+    // Send a generic error response
+    echo json_encode(["status" => "error", "message" => "There was an issue processing your order. Please try again."]);
 }
+
+$conn->close();
 ?>
