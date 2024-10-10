@@ -212,22 +212,22 @@ if ($cakeCategoryResult && $cakeCategoryResult->num_rows > 0) {
       <h2 class="text-3xl font-semibold">About Us</h2>
       <p class="mt-4 text-lg text-gray-600">We specialize in crafting cakes that are as delicious as they are beautiful. Whether you’re celebrating a wedding, birthday, or any special event, we have a cake for every occasion.</p>
     </div>
-  </section>
 
-  <section id="categories" class="py-12 bg-gray-100">
-    <div class="max-w-6xl mx-auto px-4">
-      <h2 class="text-3xl font-semibold text-center">Our Cake Categories</h2>
 
-      <div class="flex justify-between items-center mt-8">
-        <!-- Grid of Cake Categories -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          <?php
-          // Loop through categories and display them
-          if ($categoryResult->num_rows > 0) {
-            while ($category = $categoryResult->fetch_assoc()) {
-              $categoryName = htmlspecialchars($category['category_name']);
-              $latestImage = isset($latestImages[$categoryName]) ? $latestImages[$categoryName] : 'images/category-placeholder.jpg'; // Placeholder image if none found
-              echo '
+    <section id="categories" class="py-12 bg-gray-100">
+      <div class="max-w-6xl mx-auto px-4">
+        <h2 class="text-3xl font-semibold text-center">Our Cake Categories</h2>
+
+        <div class="flex justify-between items-center mt-8">
+          <!-- Grid of Cake Categories -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <?php
+            // Loop through categories and display them
+            if ($categoryResult->num_rows > 0) {
+              while ($category = $categoryResult->fetch_assoc()) {
+                $categoryName = htmlspecialchars($category['category_name']);
+                $latestImage = isset($latestImages[$categoryName]) ? $latestImages[$categoryName] : 'images/category-placeholder.jpg'; // Placeholder image if none found
+                echo '
                                 <div class="bg-white rounded-lg shadow-md overflow-hidden">
                                     <a href="cakes.php?category=' . urlencode($categoryName) . '">
                                         <img src="' . $latestImage . '" alt="' . $categoryName . ' image" class="w-full h-48 object-cover rounded-lg mb-4">
@@ -235,15 +235,38 @@ if ($cakeCategoryResult && $cakeCategoryResult->num_rows > 0) {
                                     </a>
                                 </div>
                             ';
+              }
+            } else {
+              echo '<p class="text-center text-gray-600">No categories found.</p>';
             }
-          } else {
-            echo '<p class="text-center text-gray-600">No categories found.</p>';
-          }
-          ?>
+            ?>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+      <script>
+        // Function to load category dynamically without reloading the page
+        function loadCategory(category) {
+          const contentArea = document.getElementById('dynamicContent');
+          contentArea.innerHTML = '<p>Loading...</p>'; // Show loading message
+
+          // Use Fetch API to get content from cakes.php dynamically
+          fetch('cakes.php?category=' + category)
+            .then(response => response.text())
+            .then(data => {
+              contentArea.innerHTML = data; // Replace content area with fetched data
+            })
+            .catch(error => {
+              contentArea.innerHTML = '<p>Failed to load content. Please try again.</p>';
+            });
+        }
+
+        // Handle Cake Menu link to load all cakes initially
+        document.getElementById('menuLink').addEventListener('click', function(e) {
+          e.preventDefault();
+          loadCategory('all');
+        });
+      </script>
+    </section>
 </body>
 
 </html>

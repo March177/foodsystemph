@@ -7,295 +7,287 @@
   <title>Order Cake</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.1/dist/tailwind.min.css" rel="stylesheet" />
   <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #f7fafc;
-    }
-
-    .thumbnail img {
-      border-radius: 10px;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-
-    .thumbnail img:hover {
-      transform: scale(1.1);
-    }
-
-    .star {
-      color: #fbbf24;
-      /* Star color */
+    .input-container {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
     }
 
     .input-box {
-      border-color: #cbd5e0;
-      background-color: #edf2f7;
+      flex: 1;
+      margin-right: 1rem;
     }
 
-    .input-box:focus {
-      border-color: #d53f8c;
-      /* Change border color on focus */
-      box-shadow: 0 0 0 1px #d53f8c;
-      /* Change shadow color */
-    }
-
-    /* Align date and time selector in one row */
-    .date-time-wrapper {
-      display: flex;
-      gap: 1rem;
-      /* Gap between date and time fields */
-    }
-
-    /* Quantity input box styling */
-    .quantity-wrapper {
-      display: flex;
-      align-items: center;
-    }
-
-    /* Submit button styling */
-    .button-group {
-      display: flex;
-      gap: 10px;
+    .greeting-textarea {
+      resize: none;
     }
 
     .action-button {
-      background-color: #d53f8c;
-      /* Change background color to pink */
+      background-color: #ec4899;
       color: white;
-      padding: 0.75rem;
+      padding: 0.5rem 1rem;
+      border: none;
       border-radius: 0.25rem;
-      transition: background-color 0.2s ease;
-      text-align: center;
-      width: 100%;
+      cursor: pointer;
+      transition: background-color 0.3s;
     }
 
     .action-button:hover {
-      background-color: #b83280;
-      /* Darker pink on hover */
+      background-color: #db2777;
     }
 
     .quantity-button {
-      background-color: #edf2f7;
-      border: 1px solid #cbd5e0;
-      border-radius: 0.25rem;
-      cursor: pointer;
+      background-color: #f3f4f6;
+      border: 1px solid #d1d5db;
       padding: 0.5rem;
-      transition: background-color 0.2s ease;
-      height: 100%;
-      /* Match height with the input */
+      cursor: pointer;
     }
 
     .quantity-input {
       text-align: center;
-      width: 60px;
-      border: 1px solid #cbd5e0;
-      border-left: none;
-      border-right: none;
-      padding: 0.5rem 0;
-      background-color: transparent;
-      /* Remove background */
-      height: 48px;
-      /* Match height with other input boxes */
+      border: none;
     }
 
-    .quantity-wrapper {
-      height: 48px;
-      /* Match height with other input boxes */
+    .notification {
+      display: none;
+      color: red;
+      margin-top: 1rem;
     }
 
-    /* Cart Icon Styles */
     .cart-icon {
       position: relative;
       cursor: pointer;
-      margin-right: 20px;
-      display: flex;
-      align-items: center;
     }
 
-    .cart-dropdown {
+    .cart-section {
       position: absolute;
-      top: 40px;
+      top: 50px;
       right: 0;
-      background: white;
-      border: 1px solid #ccc;
-      border-radius: 5px;
+      background-color: white;
+      border: 1px solid #ddd;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       width: 300px;
+      padding: 1rem;
       display: none;
-      /* Hidden by default */
-      z-index: 1000;
     }
 
-    .cart-dropdown.active {
-      display: block;
-      /* Show the dropdown */
+    .cart-list {
+      max-height: 150px;
+      overflow-y: auto;
+      margin-bottom: 1rem;
     }
 
-    .cart-item {
-      padding: 10px;
-      border-bottom: 1px solid #f1f1f1;
-    }
-
-    .cart-item:last-child {
-      border-bottom: none;
-      /* Remove last border */
+    .item-count {
+      position: absolute;
+      top: -5px;
+      right: -10px;
+      background: red;
+      color: white;
+      border-radius: 50%;
+      padding: 2px 5px;
+      font-size: 12px;
+      cursor: pointer;
     }
   </style>
 </head>
 
 <body>
   <div class="container mx-auto p-8">
-    <!-- Cart Icon -->
-    <div class="cart-icon" onclick="toggleCartDropdown()">
-      <img src="https://img.icons8.com/material-rounded/24/000000/shopping-cart.png" alt="Cart" />
-      <span id="cart-count" class="ml-1">0</span>
-      <div id="cart-dropdown" class="cart-dropdown">
-        <h3 class="p-2 font-bold">Cart Items</h3>
-        <div id="cart-items-container">
-          <p class="p-2">No items in cart</p>
+    <div class="main-section">
+      <!-- Cart Icon -->
+      <div class="cart-icon mb-4" id="cart-icon">
+        <a href="cart.php" id="item-count-link"> <!-- Make item count clickable -->
+          <div class="item-count" id="item-count">0</div>
+        </a>
+        <div class="cart-section" id="cart-section">
+          <div class="cart-list" id="cart-list"></div>
+          <div>Total Price: $<span id="total-price">0.00</span></div>
         </div>
       </div>
-    </div>
 
-    <?php
-    // Include the database configuration file
-    include 'db/config.php';
 
-    // Get the cake ID from the URL
-    if (isset($_GET['cake_id'])) {
-      $cakeId = intval($_GET['cake_id']);
+      <!-- Cake Section -->
+      <div class="w-2/3">
+        <?php
+        include 'db/config.php';
+        if (isset($_GET['cake_id'])) {
+          $cakeId = intval($_GET['cake_id']);
+          $cakeQuery = "SELECT * FROM menu WHERE menu_id = $cakeId";
+          $cakeResult = $conn->query($cakeQuery);
 
-      // Fetch the cake details from the database
-      $cakeQuery = "SELECT * FROM menu WHERE menu_id = $cakeId";
-      $cakeResult = $conn->query($cakeQuery);
+          if ($cakeResult && $cakeResult->num_rows > 0) {
+            $cake = $cakeResult->fetch_assoc();
+        ?>
+            <div class="flex flex-col md:flex-row max-w-5xl mx-auto bg-white rounded-lg shadow-lg p-6">
+              <div class="w-full md:w-1/2">
+                <img src="<?= htmlspecialchars($cake['image_path']) ?>" alt="<?= htmlspecialchars($cake['menu_name']) ?>" class="rounded-md w-full h-auto object-cover mb-4" />
+              </div>
+              <div class="w-full md:w-1/2 md:pl-10 mt-6 md:mt-0">
+                <h2 class="text-md text-gray-500">Purple Cake Shop</h2>
+                <h1 class="text-4xl font-bold mb-2 text-pink-600"><?= htmlspecialchars($cake['menu_name']) ?></h1>
 
-      if ($cakeResult && $cakeResult->num_rows > 0) {
-        $cake = $cakeResult->fetch_assoc();
-    ?>
-        <!-- Cake Section -->
-        <div class="flex flex-col md:flex-row max-w-5xl mx-auto bg-white rounded-lg shadow-lg p-6">
-          <!-- Main Image and Thumbnails -->
-          <div class="w-full md:w-1/2">
-            <!-- Main Cake Image -->
-            <img src="<?= htmlspecialchars($cake['image_path']) ?>" alt="<?= htmlspecialchars($cake['menu_name']) ?>" class="rounded-md w-full h-auto object-cover mb-4" />
-          </div>
+                <div class="flex items-center mb-2">
+                  <span class="star text-2xl">★</span>
+                  <span class="star text-2xl">★</span>
+                  <span class="star text-2xl">★</span>
+                  <span class="star text-2xl">★</span>
+                  <span class="star text-2xl">☆</span>
+                  <span class="ml-2 text-sm text-gray-600">(4/5)</span>
+                </div>
 
-          <!-- Cake Details and Form -->
-          <div class="w-full md:w-1/2 md:pl-10 mt-6 md:mt-0">
-            <h2 class="text-md text-gray-500">Purple Cake Shop</h2>
-            <h1 class="text-4xl font-bold mb-2 text-pink-600"><?= htmlspecialchars($cake['menu_name']) ?></h1>
+                <p class="text-xl text-gray-800 mb-4">Price: $<?= htmlspecialchars($cake['price']) ?></p>
 
-            <!-- Star Ratings -->
-            <div class="flex items-center mb-2">
-              <span class="star text-2xl">★</span>
-              <span class="star text-2xl">★</span>
-              <span class="star text-2xl">★</span>
-              <span class="star text-2xl">★</span>
-              <span class="text-gray-500 ml-2">(4)</span>
+                <div class="mb-4">
+                  <label for="quantity" class="block text-sm font-medium text-gray-700">Quantity</label>
+                  <div class="flex items-center">
+                    <button id="remove-btn" class="quantity-button">-</button>
+                    <input type="number" id="quantity" value="1" min="1" class="quantity-input mx-2 w-12" readonly />
+                    <button id="add-btn" class="quantity-button">+</button>
+                  </div>
+                </div>
+
+                <div class="input-container">
+                  <div class="input-box">
+                    <label for="pickup_date" class="block text-sm font-medium text-gray-700">Pickup Date</label>
+                    <input type="date" id="pickup_date" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm" required />
+                  </div>
+                  <div class="input-box">
+                    <label for="pickup_time" class="block text-sm font-medium text-gray-700">Pickup Time</label>
+                    <input type="time" id="pickup_time" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm" required />
+                  </div>
+                </div>
+
+                <div class="mb-4">
+                  <label for="greeting" class="block text-sm font-medium text-gray-700">Personalized Greeting/Dedication (Max 25 words)</label>
+                  <textarea id="greeting" rows="4" maxlength="150" class="greeting-textarea mt-1 block w-full border border-gray-300 rounded-md shadow-sm" placeholder="Write your greeting here..."></textarea>
+                  <div id="greeting-error" class="notification">Greeting must be 25 words or less.</div>
+                </div>
+
+                <button id="add-to-cart-btn" class="action-button">Add to Cart</button>
+                <div id="notification" class="notification">Order placed successfully!</div>
+              </div>
             </div>
-
-            <!-- Price -->
-            <p class="text-2xl mb-4 font-semibold text-gray-800">₱<?= htmlspecialchars($cake['price']) ?></p>
-
-            <!-- Quantity Input -->
-            <form onsubmit="addToCart(event)">
-              <div class="mb-4">
-                <label for="quantity" class="block text-sm font-medium">Quantity</label>
-                <div class="quantity-wrapper">
-                  <button type="button" class="quantity-button" onclick="decrementQuantity()">-</button>
-                  <input type="number" name="quantity" id="quantity" value="0" min="0" class="quantity-input" required />
-                  <button type="button" class="quantity-button" onclick="incrementQuantity()">+</button>
-                </div>
-              </div>
-
-              <!-- Pickup Date and Time (in one row) -->
-              <div class="mb-4 date-time-wrapper">
-                <!-- Pickup Date -->
-                <div class="w-1/2">
-                  <label for="pickup_date" class="block text-sm font-medium">Select Pickup Date</label>
-                  <input type="date" name="pickup_date" id="pickup_date" class="border input-box rounded-md p-2 w-full" required />
-                </div>
-
-                <!-- Pickup Time -->
-                <div class="w-1/2">
-                  <label for="pickup_time" class="block text-sm font-medium">Select Time</label>
-                  <select name="pickup_time" id="pickup_time" class="border input-box rounded-md p-2 w-full" required>
-                    <option>09:00 AM - 09:30 AM</option>
-                    <option>09:30 AM - 10:00 AM</option>
-                    <!-- Add more time options as needed -->
-                  </select>
-                </div>
-              </div>
-
-              <!-- Personalized Greeting -->
-              <div class="mb-4">
-                <label for="greeting" class="block text-sm font-medium">Personalized Greeting/Dedication</label>
-                <textarea name="greeting" id="greeting" rows="3" class="border input-box rounded-md p-2 w-full" placeholder="Enter your message here..."></textarea>
-              </div>
-
-              <input type="hidden" name="cake_id" value="<?= htmlspecialchars($cakeId) ?>" />
-
-              <!-- Button Group -->
-              <div class="button-group mb-4">
-                <button type="submit" class="action-button">Add to Cart</button>
-                <button type="button" class="action-button" onclick="buyNow(<?= htmlspecialchars($cakeId) ?>)">Buy Now</button>
-              </div>
-            </form>
-          </div>
-        </div>
-
-    <?php
-      } else {
-        echo '<p class="text-red-500">Cake not found!</p>';
-      }
-    }
-    ?>
-
+        <?php
+          } else {
+            echo "<p>Cake not found.</p>";
+          }
+        } else {
+          echo "<p>No cake selected.</p>";
+        }
+        ?>
+      </div>
+    </div>
   </div>
 
   <script>
-    function incrementQuantity() {
-      const quantityInput = document.getElementById('quantity');
-      quantityInput.value = parseInt(quantityInput.value) + 1;
+    const addBtn = document.getElementById('add-btn');
+    const removeBtn = document.getElementById('remove-btn');
+    const quantityInput = document.getElementById('quantity');
+    const greetingInput = document.getElementById('greeting');
+    const greetingError = document.getElementById('greeting-error');
+    const addToCartBtn = document.getElementById('add-to-cart-btn');
+    const itemCount = document.getElementById('item-count');
+    const totalPriceDisplay = document.getElementById('total-price');
+
+    const pickupDateInput = document.getElementById('pickup_date');
+    const pickupTimeInput = document.getElementById('pickup_time');
+
+    // Function to update cart display
+    function updateCartDisplay() {
+      let cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+      let totalPrice = parseFloat(localStorage.getItem('totalPrice')) || 0;
+
+      // Calculate the total number of items based on the add to cart action
+      let totalQuantity = cartItems.length;
+
+      itemCount.innerText = totalQuantity; // Update item count in cart icon
+      totalPriceDisplay.innerText = totalPrice.toFixed(2); // Update total price display
     }
 
-    function decrementQuantity() {
-      const quantityInput = document.getElementById('quantity');
-      if (quantityInput.value > 0) {
+    // Call the function to update the cart display when the page loads
+    updateCartDisplay();
+
+    addBtn.addEventListener('click', () => {
+      quantityInput.value = parseInt(quantityInput.value) + 1;
+    });
+
+    removeBtn.addEventListener('click', () => {
+      if (parseInt(quantityInput.value) > 1) {
         quantityInput.value = parseInt(quantityInput.value) - 1;
       }
-    }
+    });
 
-    function addToCart(event) {
-      event.preventDefault();
-      const quantity = document.getElementById('quantity').value;
-      const cakeId = document.querySelector('input[name="cake_id"]').value;
+    addToCartBtn.addEventListener('click', () => {
+      const quantity = parseInt(quantityInput.value);
+      const cakeName = "<?= htmlspecialchars($cake['menu_name']) ?>"; // Use PHP to get the cake name
+      const cakePrice = parseFloat("<?= htmlspecialchars($cake['price']) ?>"); // Use PHP to get the cake price
+      const cakeImage = "<?= htmlspecialchars($cake['image_path']) ?>"; // Use PHP to get the cake image path
+      const greeting = greetingInput.value;
+      const pickupDate = pickupDateInput.value;
+      const pickupTime = pickupTimeInput.value;
 
-      if (quantity > 0) {
-        // Logic to add item to cart
-        console.log(`Added ${quantity} of cake ID ${cakeId} to cart.`);
-        document.getElementById('cart-count').innerText = parseInt(document.getElementById('cart-count').innerText) + parseInt(quantity);
-        alert('Cake added to cart!');
+      // Validate greeting length
+      const wordCount = greeting.split(/\s+/).filter(word => word).length;
+      if (wordCount > 25) {
+        greetingError.style.display = 'block';
+        return; // Stop execution if the greeting is too long
       } else {
-        alert('Please select a quantity!');
+        greetingError.style.display = 'none';
       }
-    }
 
-    function buyNow(cakeId) {
-      const quantity = document.getElementById('quantity').value;
-      if (quantity > 0) {
-        // Logic for buying the cake directly
-        console.log(`Buying ${quantity} of cake ID ${cakeId}.`);
-      } else {
-        alert('Please select a quantity!');
+      // Validate pickup date and time
+      if (!pickupDate) {
+        alert("Please select a pickup date.");
+        return; // Stop execution if no date is selected
       }
-    }
 
-    function toggleCartDropdown() {
-      const dropdown = document.getElementById('cart-dropdown');
-      dropdown.classList.toggle('active');
-    }
+      if (!pickupTime) {
+        alert("Please select a pickup time.");
+        return; // Stop execution if no time is selected
+      }
+
+      // Prepare cart item object
+      const cartItem = {
+        name: cakeName,
+        price: cakePrice,
+        quantity: quantity, // Still keep the quantity in the cart item if you want to use it later
+        greeting: greeting,
+        pickupDate: pickupDate,
+        pickupTime: pickupTime,
+        image: cakeImage // Add image path to the cart item
+      };
+
+      // Get existing items from localStorage
+      let cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+      let totalPrice = parseFloat(localStorage.getItem('totalPrice')) || 0;
+
+      // Add new item to the cart
+      cartItems.push(cartItem);
+
+      // Update total price (count each "Add to Cart" as one item)
+      totalPrice += cakePrice;
+      localStorage.setItem('cartItems', JSON.stringify(cartItems));
+      localStorage.setItem('totalPrice', totalPrice);
+
+      // Update cart display
+      updateCartDisplay();
+
+      // Reset inputs after adding item to cart
+      quantityInput.value = 1;
+      greetingInput.value = '';
+      pickupDateInput.value = '';
+      pickupTimeInput.value = '';
+    });
+
+    // Cart icon click event to toggle visibility
+    document.getElementById('cart-icon').addEventListener('click', () => {
+      const cartSection = document.getElementById('cart-section');
+      cartSection.style.display = cartSection.style.display === 'none' ? 'block' : 'none';
+    });
   </script>
+
+
+
 </body>
 
 </html>

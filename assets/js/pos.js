@@ -147,7 +147,7 @@ document.addEventListener("DOMContentLoaded", function () {
       var discount = $("#discount").val();
       var total_price = $("#total-value").text().replace("₱", "").trim();
       var payment_method = $('input[name="payment_method"]:checked').val();
-      var customer = $("#walkin-name").val() || "Walk-in Customer"; // Assuming you have an input for customer name
+      var customer = $("#walkin-name").val() || "Walk-in Customer";
       var created_by = "1"; // Replace with actual user ID or name of the person creating the order
 
       // Collect ordered items
@@ -179,7 +179,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Send data via AJAX
       $.ajax({
-        url: "process_checkout.php",
+        url: "place_order.php",
         type: "POST",
         data: JSON.stringify(data),
         contentType: "application/json",
@@ -200,6 +200,21 @@ document.addEventListener("DOMContentLoaded", function () {
           console.error("AJAX error: " + textStatus + " : " + errorThrown);
         },
       });
+    });
+  });
+
+  document.getElementById("category").addEventListener("change", function () {
+    const selectedCategory = this.value;
+    const products = document.querySelectorAll(".productset");
+
+    products.forEach((product) => {
+      const productCategory = product.getAttribute("data-category");
+
+      if (selectedCategory === "" || productCategory === selectedCategory) {
+        product.style.display = "block";
+      } else {
+        product.style.display = "none";
+      }
     });
   });
 

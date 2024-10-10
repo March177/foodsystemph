@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cake Shop</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100">
+    <!-- Navigation -->
+    <nav class="bg-white shadow">
+      <div
+        class="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center"
+      >
+        <h1 class="text-2xl font-bold text-pink-600">Cake Shop</h1>
+        <div class="relative">
+          <button id="cartBtn" class="text-gray-700 hover:text-pink-600 px-4">
+            Cart
+            <span
+              id="cartCount"
+              class="bg-pink-600 text-white rounded-full px-2 py-1 text-xs"
+            ></span>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="bg-pink-600 text-white text-center py-20">
+      <h2 class="text-4xl font-bold">Welcome to Our Cake Shop!</h2>
+      <p class="mt-4 text-lg">Delicious cakes made with love.</p>
+    </section>
+
+    <!-- Menu Section -->
+    <section id="menu" class="py-20">
+      <div class="max-w-7xl mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center text-gray-800">Our Menu</h2>
+        <div class="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div class="bg-white shadow-lg rounded-lg p-6 text-center">
+            <h3 class="text-xl font-semibold">Chocolate Cake</h3>
+            <p class="mt-2 text-gray-600">$25.00</p>
+            <button
+              class="bg-pink-600 text-white font-bold py-2 px-4 rounded mt-4 add-to-cart"
+              data-name="Chocolate Cake"
+              data-price="25.00"
+            >
+              Add to Cart
+            </button>
+          </div>
+          <div class="bg-white shadow-lg rounded-lg p-6 text-center">
+            <h3 class="text-xl font-semibold">Vanilla Cupcakes</h3>
+            <p class="mt-2 text-gray-600">$15.00</p>
+            <button
+              class="bg-pink-600 text-white font-bold py-2 px-4 rounded mt-4 add-to-cart"
+              data-name="Vanilla Cupcakes"
+              data-price="15.00"
+            >
+              Add to Cart
+            </button>
+          </div>
+          <div class="bg-white shadow-lg rounded-lg p-6 text-center">
+            <h3 class="text-xl font-semibold">Red Velvet Cake</h3>
+            <p class="mt-2 text-gray-600">$30.00</p>
+            <button
+              class="bg-pink-600 text-white font-bold py-2 px-4 rounded mt-4 add-to-cart"
+              data-name="Red Velvet Cake"
+              data-price="30.00"
+            >
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cart Section -->
+    <section id="cart" class="hidden bg-gray-200 py-20">
+      <div class="max-w-7xl mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center text-gray-800">Your Cart</h2>
+        <div id="cartItems" class="mt-10"></div>
+        <div class="flex justify-between font-bold mt-4">
+          <span>Total:</span>
+          <span id="cartTotal">$0.00</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white py-4 text-center">
+      <p class="text-gray-600">© 2023 Cake Shop. All rights reserved.</p>
+    </footer>
+
+    <script>
+      let cart = [];
+      const cartCount = document.getElementById("cartCount");
+      const cartItems = document.getElementById("cartItems");
+      const cartTotal = document.getElementById("cartTotal");
+      const cartSection = document.getElementById("cart");
+
+      document.querySelectorAll(".add-to-cart").forEach((button) => {
+        button.addEventListener("click", () => {
+          const name = button.dataset.name;
+          const price = parseFloat(button.dataset.price);
+          cart.push({ name, price });
+          updateCart();
+        });
+      });
+
+      document.getElementById("cartBtn").addEventListener("click", () => {
+        cartSection.classList.toggle("hidden");
+      });
+
+      function updateCart() {
+        cartCount.innerText = cart.length;
+        cartItems.innerHTML = "";
+
+        let total = 0;
+        cart.forEach((item) => {
+          const itemTotal = item.price.toFixed(2);
+          total += item.price;
+          cartItems.innerHTML += `<div class="flex justify-between py-2 border-b"><span>${item.name}</span><span>$${itemTotal}</span></div>`;
+        });
+
+        cartTotal.innerText = `$${total.toFixed(2)}`;
+      }
+    </script>
+  </body>
+</html>
