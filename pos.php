@@ -53,12 +53,6 @@ $menuResult = $conn->query($menuQuery);
 
   <link rel="stylesheet" href="assets/css/animate.css" />
 
-  <link
-    rel="stylesheet"
-    href="assets/plugins/owlcarousel/owl.carousel.min.css" />
-  <link
-    rel="stylesheet"
-    href="assets/plugins/owlcarousel/owl.theme.default.min.css" />
 
   <link rel="stylesheet" href="assets/plugins/select2/css/select2.min.css" />
 
@@ -70,104 +64,20 @@ $menuResult = $conn->query($menuQuery);
   <link rel="stylesheet" href="assets/plugins/fontawesome/css/all.min.css" />
 
   <link rel="stylesheet" href="assets/css/style.css" />
-  <style>
-    .select-split {
-      margin-bottom: 15px;
-    }
+  <link rel="stylesheet" href="assets/css/pos.css" />
 
-    .select-group {
-      position: relative;
-    }
-
-    .form-select {
-      margin-bottom: 1rem;
-    }
-
-    .form-check {
-      display: inline-block;
-      margin: 0.5rem;
-    }
-
-    .form-check-input:checked+.form-check-label {
-      background-color: #FF8343;
-      color: #fff;
-    }
-
-    .form-check-input {
-      position: absolute;
-      opacity: 0;
-    }
-
-    .form-check-label {
-      display: block;
-      padding: 10px 20px;
-      cursor: pointer;
-      border: 1px solid #ced4da;
-      border-radius: 0.25rem;
-      text-align: center;
-    }
-
-    .form-check-label:hover {
-      background-color: #e9ecef;
-    }
-
-    .form-label {
-      font-weight: bold;
-    }
-
-    .highlight-label {
-      color: #007bff;
-      font-weight: bold;
-      font-size: 1.2rem;
-      background-color: #f0f8ff;
-      padding: 0.5rem;
-      border-radius: 4px;
-    }
-
-
-    .paymentmethod.active {
-      background-color: #f0f0f0;
-      border: 2px solid #007bff;
-      border-radius: 4px;
-    }
-
-    .checkout-form {
-      background: white;
-      padding: 20px;
-      border-radius: 5px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .is-invalid {
-      border: 2px solid red;
-      /* Highlight invalid fields */
-    }
-
-    .btn-totallabel {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px;
-      background-color: #28a745;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .btn-totallabel:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-    }
-  </style>
 </head>
 
 <body>
 
   <div class="main-wrappers">
+    <div id="notification" class="notification">
+      <span id="notification-message">Order submitted successfully!</span>
+    </div>
     <div class="header">
       <?php include 'php/header.php'; ?>
     </div>
+
     <div class="page-wrapper ms-0">
       <div class="content">
         <div class="row">
@@ -718,11 +628,14 @@ $menuResult = $conn->query($menuQuery);
           }
 
           // Proceed with the order submission (this is where you'd call your order submission function)
-          alert("Order submitted successfully!"); // Placeholder for AJAX call
+          // alert("Order submitted successfully!"); // Placeholder for AJAX call
         });
       });
-      // Function to show the receipt popup
+
       function showReceipt(orderDetails) {
+        const subtotal = orderDetails.subtotal || 0; // Fallback to 0 if undefined
+        const total_price = orderDetails.total_price || 0; // Fallback to 0 if undefined
+
         const receiptModal = document.createElement('div');
         receiptModal.className = 'modal fade';
         receiptModal.id = 'receiptModal';
@@ -731,52 +644,109 @@ $menuResult = $conn->query($menuQuery);
         receiptModal.setAttribute('aria-hidden', 'true');
 
         receiptModal.innerHTML = `
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="receiptModalLabel">Receipt</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content receipt-content" id="receiptContent">
+            <div class="modal-body receipt-body">
+                <div class="receipt-header text-center">
+                    <h2 class="order-number">${orderDetails.order_id}</h2>
+                    <p class="translated-text">PINK Cake</p>
+                </div>
+
+                <div class="store-info">
+                    <p>Minglanilla - Calajoan Cebu</p>
+                    <p>SHOP 1, 1/F, THE ADDITIONAL</p>
+                    <p>: 123456 Phone: 2677 0202</p>
+                    <p>Order Time: ${new Date(orderDetails.order_time || Date.now()).toLocaleString()}</p>
+                    <p>Cashier: ${orderDetails.cashier_name || ''}</p>
+                    <p>Order ID: ${orderDetails.order_id}</p>
+                </div>
+
+                <div class="receipt-divider">****************************************************************************************</div>
+
+                <table class="receipt-table">
+                    ${orderDetails.items.map(item => `
+                        <tr>
+                            <td>${item.quantity}x ${item.menu_name}</td>
+                            <td class="text-end">₱${(item.price * item.quantity).toFixed(2)}</td>
+                        </tr>
+                    `).join('')}
+                </table>
+
+                <div class="receipt-divider">****************************************************************************************</div>
+
+                <div class="receipt-total-section">
+                    <div class="total-row">
+                        <span>Total:</span>
+                        <span class="text-end">₱${total_price.toFixed(2)}</span>
                     </div>
-                    <div class="modal-body">
-                        <h6>Order ID: ${orderDetails.order_id}</h6>
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Menu Name</th>
-                                    <th>Quantity</th>
-                                    <th>Price</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${orderDetails.items.map(item => `
-                                    <tr>
-                                        <td>${item.menu_name}</td>
-                                        <td>${item.quantity}</td>
-                                        <td>₱${(item.price * item.quantity).toFixed(2)}</td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                        <h6>Subtotal: ₱${orderDetails.subtotal.toFixed(2)}</h6>
-                        <h6>Total: ₱${orderDetails.total_price.toFixed(2)}</h6>
-                        <h6>Cashier: ${orderDetails.cashier_name}</h6>
+                    <div class="total-row">
+                        <span>Cash:</span>
+                        <span class="text-end">₱${orderDetails.cash || 0}</span>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <div class="total-row">
+                        <span>Change:</span>
+                        <span class="text-end">₱${(orderDetails.cash - total_price).toFixed(2)}</span>
                     </div>
                 </div>
+
+                <div class="receipt-footer">
+                    <p>We love to hear your feedback</p>
+                    <p>Email us at PinkCake@gmail.com</p>
+                    <p>Take our survey at</p>
+                </div>
             </div>
-        `;
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="printReceiptButton">Print Receipt</button> <!-- Added print button -->
+            </div>
+        </div>
+    </div>
+    `;
 
         document.body.appendChild(receiptModal);
         var modal = new bootstrap.Modal(receiptModal);
         modal.show();
+
+        // Add print functionality to the Print Receipt button
+        const printButton = document.getElementById('printReceiptButton');
+        printButton.addEventListener('click', function() {
+          printReceipt();
+        });
+
+        // Function to print the receipt
+        function printReceipt() {
+          const printContent = document.getElementById('receiptContent').innerHTML;
+          const originalContent = document.body.innerHTML;
+
+          document.body.innerHTML = printContent;
+          window.print();
+          document.body.innerHTML = originalContent;
+          window.location.reload(); // Reload to restore the original content after printing
+        }
+
+        // Clear cart after the order is successful
+        clearCart();
 
         // Cleanup after modal is closed
         receiptModal.addEventListener('hidden.bs.modal', function() {
           document.body.removeChild(receiptModal);
         });
       }
+
+      function clearCart() {
+        localStorage.removeItem('cartItems'); // Clear from localStorage
+        productListsContainer.innerHTML = ''; // Clear product list in UI
+        totalItemsElement.textContent = '0'; // Reset item count
+        subtotalElement.textContent = '₱0.00'; // Reset subtotal
+        discountElement.textContent = '₱0.00'; // Reset discount
+        totalElement.textContent = '₱0.00'; // Reset total
+        if (checkoutTotalElement) {
+          checkoutTotalElement.textContent = '₱0.00'; // Reset checkout total
+        }
+        console.log("Cart has been cleared.");
+      }
+
+
       $("#checkoutBtn").click(function() {
         var order_type = $("#orderType").val();
         var discount = $("#discount").val();
@@ -788,17 +758,14 @@ $menuResult = $conn->query($menuQuery);
         var orderedItems = [];
         $(".product-lists li[data-id]").each(function() {
           var item = {
-            menu_id: $(this).attr("data-id"), // Ensure this is correct
+            menu_id: $(this).attr("data-id"),
             menu_name: $(this).find("h4").text().trim(),
-            quantity: parseInt($(this).find(".quantity-field").val()), // Ensure this is a number
+            quantity: parseInt($(this).find(".quantity-field").val()),
             price: parseFloat($(this).next(".price-item").text().replace("Price: ", "").trim())
           };
 
-          // Check if all properties are defined
           if (item.menu_id && item.menu_name && !isNaN(item.quantity) && item.price) {
             orderedItems.push(item);
-          } else {
-            console.error("Item data is incomplete or invalid", item);
           }
         });
 
@@ -812,8 +779,6 @@ $menuResult = $conn->query($menuQuery);
           orderedItems: orderedItems,
         };
 
-        console.log("Data to be sent:", data); // Check the final data structure
-
         $.ajax({
           url: "place_order.php",
           type: "POST",
@@ -821,25 +786,26 @@ $menuResult = $conn->query($menuQuery);
           contentType: "application/json",
           dataType: "json",
           success: function(response) {
+            console.log("Response from server:", response); // Log the response
             if (response.status === "success") {
-              alert(response.message);
+              showNotification("Order submitted successfully!");
+
               // Prepare order details for receipt
               const orderDetails = {
                 order_id: response.order_id,
                 items: orderedItems,
-                subtotal: response.subtotal,
-                total_price: total_price,
+                subtotal: response.subtotal || 0, // Ensure this is a number
+                total_price: parseFloat(total_price.replace("₱", "").trim()) || 0, // Convert to number
                 cashier_name: "Cashier Name" // Replace with dynamic cashier name if available
               };
-
               // Show the receipt popup
               showReceipt(orderDetails);
-
-              window.location.href = "pos.php"; // Redirect after successful order
+              // window.location.href = "pos.php"; // Comment this out for now
             } else {
               alert("Error: " + response.message);
             }
           },
+
           error: function(jqXHR, textStatus, errorThrown) {
             console.log("Server response:", jqXHR.responseText);
             alert("There was an error processing your order: " + jqXHR.responseText);
@@ -849,13 +815,21 @@ $menuResult = $conn->query($menuQuery);
 
 
 
+      // Show notification
+      function showNotification(message) {
+        const notification = document.getElementById("notification");
+        const notificationMessage = document.getElementById("notification-message");
+        notificationMessage.textContent = message;
+        notification.style.display = "block";
+        notification.style.opacity = 1;
 
-
-
-
-
-
-
+        setTimeout(() => {
+          notification.style.opacity = 0;
+          setTimeout(() => {
+            notification.style.display = "none";
+          }, 500); // Wait for fade-out before hiding
+        }, 3000); // Display for 3 seconds
+      }
 
 
       document.getElementById("category").addEventListener("change", function() {
@@ -953,15 +927,19 @@ $menuResult = $conn->query($menuQuery);
 
   <script src="assets/js/bootstrap.bundle.min.js"></script>
 
-  <script src="assets/js/jquery.dataTables.min.js"></script>
   <script src="assets/js/dataTables.bootstrap4.min.js"></script>
 
   <script src="assets/plugins/select2/js/select2.min.js"></script>
 
-  <script src="assets/plugins/owlcarousel/owl.carousel.min.js"></script>
 
-  <script src="assets/plugins/sweetalert/sweetalert2.all.min.js"></script>
-  <script src="assets/plugins/sweetalert/sweetalerts.min.js"></script>
+  <!-- Bootstrap CSS -->
+
+
+  <!-- Bootstrap JS and dependencies (Popper.js) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.min.js"></script>
+
 
   <script src="assets/js/script.js"></script>
 </body>

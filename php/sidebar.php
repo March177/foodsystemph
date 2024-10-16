@@ -50,6 +50,17 @@ function isActive($page)
             <li><a href="adddiscount.php" class="<?php echo isActive('addiscount.php'); ?>">Add Discount</a></li>
           </ul>
         </li>
+
+        <li class="submenu">
+          <a href="javascript:void(0);">
+            <img src="assets/img/icons/quotation1.svg" alt="img" /><span>Cashier</span>
+            <span class="menu-arrow"></span>
+          </a>
+          <ul>
+            <li><a href="pos.php" class="<?php echo isActive('pos.php'); ?>">Pos</a></li>
+
+          </ul>
+        </li>
         <li class="submenu">
           <a href="javascript:void(0);">
             <img src="assets/img/icons/users1.svg" alt="img" /><span>People</span>
@@ -79,8 +90,8 @@ function isActive($page)
             <span class="menu-arrow"></span>
           </a>
           <ul>
-            <li><a href="newuser.php" class="<?php echo isActive('newuser.php'); ?>">New User</a></li>
-            <li><a href="userlists.php" class="<?php echo isActive('userlists.php'); ?>">Users List</a></li>
+            <li><a href="adduser.php" class="<?php echo isActive('adduser.php'); ?>">New User</a></li>
+            <li><a href="userlist.php" class="<?php echo isActive('userlists.php'); ?>">Users List</a></li>
           </ul>
         </li>
         <li class="submenu">

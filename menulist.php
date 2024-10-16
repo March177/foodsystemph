@@ -23,7 +23,6 @@ $query = "
         price, 
         image_path, 
         description, 
-        discount_type, 
         status, 
         category_name
     FROM 
@@ -180,7 +179,6 @@ if (isset($_POST['delete_menu']) && isset($_POST['menu_id'])) {
                                         <th>Category</th>
                                         <th>Price</th>
                                         <th>Description</th>
-                                        <th>Discount Type</th>
                                         <th>Status</th>
                                         <th>Action</th>
                                     </tr>
@@ -203,7 +201,7 @@ if (isset($_POST['delete_menu']) && isset($_POST['menu_id'])) {
                                             <td><?php echo htmlspecialchars($row['category_name']); ?></td>
                                             <td><?php echo htmlspecialchars($row['price']); ?></td>
                                             <td><?php echo htmlspecialchars(substr($row['description'], 0, 30)) . '...'; ?></td>
-                                            <td><?php echo htmlspecialchars($row['discount_type']); ?></td>
+
                                             <td><?php echo htmlspecialchars($row['status']); ?></td>
                                             <td>
                                                 <a class="me-3" href="menu-details.php?id=<?php echo $row['menu_id']; ?>">

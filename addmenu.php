@@ -22,15 +22,21 @@ $categoryResult = $conn->query($categoryQuery);
     <meta name="robots" content="noindex, nofollow" />
     <title>Add Product</title>
 
-    <link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.jpg" />
+    <link
+        rel="shortcut icon"
+        type="image/x-icon"
+        href="assets/img/favicon.jpg" />
+
     <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
     <link rel="stylesheet" href="assets/css/animate.css" />
     <link rel="stylesheet" href="assets/plugins/select2/css/select2.min.css" />
     <link rel="stylesheet" href="assets/css/dataTables.bootstrap4.min.css" />
-    <link rel="stylesheet" href="assets/plugins/fontawesome/css/fontawesome.min.css" />
+    <link
+        rel="stylesheet"
+        href="assets/plugins/fontawesome/css/fontawesome.min.css" />
     <link rel="stylesheet" href="assets/plugins/fontawesome/css/all.min.css" />
     <link rel="stylesheet" href="assets/css/style.css" />
-    <link rel="stylesheet" href="assets/css/product.css" />
+
 
 
 </head>
@@ -88,17 +94,7 @@ $categoryResult = $conn->query($categoryQuery);
                                         <textarea name="description" class="form-control" required></textarea>
                                     </div>
                                 </div>
-                                <div class="col-lg-3 col-sm-6 col-12">
-                                    <div class="form-group">
-                                        <label>Discount Type</label>
-                                        <select name="discount_type" class="form-control" required>
-                                            <option value="">Choose Discount Type</option>
-                                            <option value="Percentage">Percentage</option>
-                                            <option value="10%">10%</option>
-                                            <option value="20%">20%</option>
-                                        </select>
-                                    </div>
-                                </div>
+
                                 <div class="col-lg-3 col-sm-6 col-12">
                                     <div class="form-group">
                                         <label>Price</label>
@@ -136,11 +132,15 @@ $categoryResult = $conn->query($categoryQuery);
         </div>
     </div>
 
-    <script src="assets/js/jquery-3.5.1.min.js"></script>
-    <script src="assets/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/plugins/select2/js/select2.min.js"></script>
+    <script src="assets/js/jquery-3.6.0.min.js"></script>
+    <script src="assets/js/feather.min.js"></script>
+    <script src="assets/js/jquery.slimscroll.min.js"></script>
     <script src="assets/js/jquery.dataTables.min.js"></script>
     <script src="assets/js/dataTables.bootstrap4.min.js"></script>
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/plugins/select2/js/select2.min.js"></script>
+    <script src="assets/plugins/sweetalert/sweetalert2.all.min.js"></script>
+    <script src="assets/plugins/sweetalert/sweetalerts.min.js"></script>
     <script src="assets/js/script.js"></script>
     <script>
         document.getElementById('file-upload').addEventListener('change', function() {

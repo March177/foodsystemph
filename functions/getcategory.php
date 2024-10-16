@@ -1,5 +1,5 @@
 <?php
-include 'db/config.php'; // Ensure this path is correct
+include '../db/config.php'; // Ensure this path is correct
 
 // Check if form is submitted for delete, update, or insert operations
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

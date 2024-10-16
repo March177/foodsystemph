@@ -116,14 +116,14 @@ if ($result && mysqli_num_rows($result) > 0) {
                                     </div>
                                 </div>
                                 <div class="col-lg-3 col-sm-6 col-12">
-    <div class="form-group">
-        <label>Status</label>
-        <select name="status" class="form-control">
-            <option value="Available" <?php echo ($menu['status'] == 'Available') ? 'selected' : ''; ?>>Available</option>
-            <option value="Not Available" <?php echo ($menu['status'] == 'Not Available') ? 'selected' : ''; ?>>Not Available</option>
-        </select>
-    </div>
-</div>
+                                    <div class="form-group">
+                                        <label>Status</label>
+                                        <select name="status" class="form-control">
+                                            <option value="Available" <?php echo ($menu['status'] == 'Available') ? 'selected' : ''; ?>>Available</option>
+                                            <option value="Not Available" <?php echo ($menu['status'] == 'Not Available') ? 'selected' : ''; ?>>Not Available</option>
+                                        </select>
+                                    </div>
+                                </div>
 
 
                                 <div class="col-lg-12">

@@ -26,9 +26,7 @@ function get_filtered_menu($filter)
     if (!empty($filter['price'])) {
         $query .= " AND price LIKE '%" . mysqli_real_escape_string($conn, $filter['price']) . "%'";
     }
-    if (!empty($filter['discount_type'])) {
-        $query .= " AND discount_type LIKE '%" . mysqli_real_escape_string($conn, $filter['discount_type']) . "%'";
-    }
+
     if (!empty($filter['created_by'])) {
         $query .= " AND created_by LIKE '%" . mysqli_real_escape_string($conn, $filter['created_by']) . "%'";
     }
@@ -79,7 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $menu_name = trim($_POST['menu_name']);
     $category_name = trim($_POST['category_name']);
     $description = trim($_POST['description']);
-    $discount_type = trim($_POST['discount_type']);
+
     $price = trim($_POST['price']);
     $status = trim($_POST['status']);
 
@@ -117,14 +115,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
 
             if (move_uploaded_file($_FILES['menu_image']['tmp_name'], $uploadFile)) {
-                $stmt = $conn->prepare("INSERT INTO menu (menu_name, category_name, created_by, description, discount_type, price, status, image_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt = $conn->prepare("INSERT INTO menu (menu_name, category_name, created_by, description,price, status, image_path) VALUES (?, ?, ?, ?, ?, ?, ?)");
                 if ($stmt === false) {
                     echo "Prepare failed: " . htmlspecialchars($conn->error);
                     exit();
                 }
 
                 $imagePath = 'img/menu/' . $fileName;
-                $stmt->bind_param("ssssssss", $menu_name, $category_name, $created_by, $description, $discount_type, $price, $status, $imagePath);
+                $stmt->bind_param("sssssss", $menu_name, $category_name, $created_by, $description, $price, $status, $imagePath);
 
                 if ($stmt->execute()) {
                     header("Location: /RestaurantSystem-master/menulist.php");

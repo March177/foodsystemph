@@ -1,7 +1,8 @@
 <?php
 
-include 'db/config.php';
-include 'functions/getcategory.php';
+include '../db/config.php';
+include '../functions/getcategory.php';
+
 
 $filter = [
   'status' => isset($_GET['status']) ? $_GET['status'] : ''
@@ -45,9 +46,9 @@ $rows = get_filtered_categories($filter);
 <body>
   <div class="main-wrapper">
     <div class="header">
-      <?php include 'php/header.php'; ?>
+      <?php include '../php/header.php' ?>
     </div>
-    <?php include 'php/sidebar.php'; ?>
+    <?php include '../php/sidebar.php'; ?>
 
     <div class="page-wrapper">
       <div class="content">

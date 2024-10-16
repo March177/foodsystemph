@@ -1,5 +1,17 @@
 <?php
-include 'db/config.php'; // Ensure this path is correct
+$host = 'localhost';  // Database host
+$user = 'root';       // Database username
+$pass = '';           // Database password
+$db   = 'restaurant_db'; // Database name
+
+try {
+    // Create a PDO connection
+    $pdo = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
+    // Set the PDO error mode to exception
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Connection failed: " . $e->getMessage());
+}
 
 // Paymongo API Key
 $apiKey = 'sk_test_a1ZMzqyoDN52eagaxepwv6rm'; // Replace with your actual Paymongo API key
@@ -60,7 +72,6 @@ function insertPaymentsIntoDatabase($payments, $pdo)
     }
 }
 
-// Connect to the database using PDO
 try {
     // Fetch payments from Paymongo
     $payments = fetchSuccessfulPayments($apiKey);
